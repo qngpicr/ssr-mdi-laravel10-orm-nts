@@ -3,33 +3,23 @@
 namespace App\Models\Mysql;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class DeviceModelMysql extends Model
 {
-    protected $connection = 'mysql';   // DB 연결 그룹
-    protected $table      = 'device';  // 테이블명
+    protected $connection = 'mysql';
+    protected $table      = 'device';
     protected $primaryKey = 'id';
+    public $timestamps    = false;
 
-    public $timestamps = false;
-
-    public function countAll(): int
+    // 전체 개수 (ORM 방식)
+    public function scopeCountAll($query): int
     {
-        $row = DB::connection($this->connection)
-                 ->table($this->table)
-                 ->selectRaw('COUNT(*) AS cnt')
-                 ->first();
-
-        return (int) $row->cnt;
+        return $query->count();
     }
 
-    public function getHotItems(): array
+    // 인기 Device 가져오기 (ORM 방식)
+    public function scopeHotItems($query)
     {
-        return DB::connection($this->connection)
-                 ->table($this->table)
-                 ->orderBy('choice_device', 'desc')
-                 ->limit(5)
-                 ->get()
-                 ->toArray();
+        return $query->orderBy('choice_device', 'desc')->limit(5);
     }
 }
